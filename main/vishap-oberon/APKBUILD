@@ -4,11 +4,11 @@
 pkgname="vishap-oberon-compiler"
 pkgver="2.1.2"
 pkgrel=0
-pkgdesc="Vishap Oberon Compiler (VOC)"
+pkgdesc="Vishap Oberon Compiler (VOC) built with TCC"
 url="https://github.com/vishapoberon/compiler"
 arch="all"
 license="GPL-3.0-or-later"
-makedepends="build-base"
+makedepends="build-base tcc"
 source="$pkgname-$pkgver.tar.gz::https://github.com/vishapoberon/compiler/archive/refs/tags/v$pkgver.tar.gz"
 
 builddir="$srcdir/compiler-$pkgver"
@@ -22,13 +22,7 @@ prepare() {
 build() {
 	cd "$builddir"
 
-	local _cflags="-std=gnu89 -fpermissive \
-		-Wno-error=conflicting-types \
-		-Wno-error=mismatched-parameter-types \
-		-Wno-error=implicit-function-declaration \
-		-Wno-error=int-conversion"
-
-	make -j1 full CC="gcc $_cflags"
+	make -j1 full CC="tcc"
 }
 
 package() {
@@ -41,7 +35,7 @@ package() {
 		cp -r install/bin/* "$pkgdir"/usr/bin/
 		cp -r install/lib/* "$pkgdir"/usr/lib/voc/
 	else
-		echo "ERROR: 'install' directory was not created!"
+		echo "ERROR: 'install' directory missing"
 		return 1
 	fi
 }
