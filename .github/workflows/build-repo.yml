@@ -25,15 +25,14 @@ jobs:
       - name: build pkgs
         run: |
           mkdir -p output_packages
+          chmod 777 output_packages
           
           docker run --rm -v ${{ github.workspace }}:/work -w /work --platform ${{ matrix.platform }} alpine:latest sh -c '
             apk add alpine-sdk sudo
-            
             adduser -D builder && addgroup builder abuild
             echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
             
             mkdir -p /home/builder/.abuild
-            
             PUBKEY=$(ls /work/keys/*.pub | head -n 1)
             PUBKEY_NAME=$(basename "$PUBKEY")
             PRIVKEY_NAME="${PUBKEY_NAME%.pub}"
@@ -41,18 +40,26 @@ jobs:
             echo "${{ secrets.ALPINE_PRIVKEY }}" > /home/builder/.abuild/$PRIVKEY_NAME
             cp "$PUBKEY" /home/builder/.abuild/$PUBKEY_NAME
             cp "$PUBKEY" /etc/apk/keys/$PUBKEY_NAME
-            
             echo "PACKAGER_PRIVKEY=/home/builder/.abuild/$PRIVKEY_NAME" > /home/builder/.abuild/abuild.conf
             
             chown -R builder:builder /home/builder/.abuild
             chown -R builder:builder /work
             
-            for pkg_dir in $(find . -mindepth 2 -name APKBUILD -exec dirname {} \;); do
-              echo "Building in $pkg_dir for ${{ matrix.arch }}..."
-              su builder -c "cd $pkg_dir && abuild -r -c" || exit 1
+            for pkg_dir in /work/main/*; do
+              if [ -f "$pkg_dir/APKBUILD" ]; then
+                echo "building in $pkg_dir for ${{ matrix.arch }}..."
+                su builder -c "cd $pkg_dir && abuild -r -c" || exit 1
+              fi
             done
             
-            cp -r /home/builder/packages/builder/${{ matrix.arch }}/* /work/output_packages/ || true
+            if [ -d /home/builder/packages ]; then
+              cp -a /home/builder/packages/* /work/output_packages/
+              echo "build successful. artifacts:"
+              find /work/output_packages/ -type f
+            else
+              echo "err: /home/builder/packages not found."
+              exit 1
+            fi
           '
 
       - name: upload artifacts
