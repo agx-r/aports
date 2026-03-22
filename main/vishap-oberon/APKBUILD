@@ -30,3 +30,6 @@ check() {
 package() {
   make DESTDIR="$pkgdir" PREFIX="/usr" install
 }
+sha512sums="
+96482b90c36fa1e237c459bdc0fa837f14655bab8e144c6f5a4d94ac721789b7330bfbd41a7e5ce7a7c0e85e201e55bcd124a28bf659af53d7251fcad1d1d80b  vishap-oberon-compiler-2.1.2.tar.gz
+"
