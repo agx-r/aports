@@ -112,11 +112,9 @@ source="
 
 builddir="$srcdir/AyuGramDesktop-$pkgver"
 
-# Маппинг: путь субмодуля -> имя каталога в srcdir после распаковки
-# (имя = <reponame>-<commit>)
 _module_map="
 cmake:cmake_helpers-ba366ade3e70c64d1dd854382abd74f532ba41a1
-cmake/external/glib/cppgir:2a7d9cef68202a29d5e8a679ce9519c76eb26dc3
+cmake/external/glib/cppgir:cppgir-2a7d9cef68202a29d5e8a679ce9519c76eb26dc3
 cmake/external/glib/cppgir/expected-lite:expected-lite-95b9cb015fa17baa749c2b396b335906e1596a9e
 Telegram/codegen:codegen-1c919609d4573f2be91dafef923f8f9e2c08cdff
 Telegram/lib_base:lib_base-444ab33475734485dcc183a5fb86875c134fac8b
@@ -168,7 +166,6 @@ prepare() {
 		fi
 	done
 
-	# Исправление для protobuf
 	sed -i 's/find_package(protobuf REQUIRED)/find_package(protobuf REQUIRED CONFIG)/' \
 		Telegram/ThirdParty/cld3/CMakeLists.txt
 }
