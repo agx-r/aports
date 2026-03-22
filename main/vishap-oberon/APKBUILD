@@ -1,5 +1,6 @@
 # Contributor: agx <agxr@tuta.io>
 # Maintainer: agx <agxr@tuta.io>
+
 pkgname="vishap-oberon-compiler"
 pkgver="2.1.2"
 pkgrel=0
@@ -9,6 +10,7 @@ arch="all"
 license="GPL-3.0-or-later"
 makedepends="build-base"
 source="$pkgname-$pkgver.tar.gz::https://github.com/vishapoberon/compiler/archive/refs/tags/v$pkgver.tar.gz"
+
 builddir="$srcdir/compiler-$pkgver"
 
 prepare() {
@@ -19,26 +21,31 @@ prepare() {
 
 build() {
 	cd "$builddir"
-	export CFLAGS="$CFLAGS -std=gnu89 -fpermissive \
+
+	local _cflags="-std=gnu89 -fpermissive \
 		-Wno-error=conflicting-types \
 		-Wno-error=mismatched-parameter-types \
-		-Wno-error=implicit-function-declaration"
+		-Wno-error=implicit-function-declaration \
+		-Wno-error=int-conversion"
 
-	make -j1 -f makefile full
+	make -j1 full CC="gcc $_cflags"
 }
 
 package() {
 	cd "$builddir"
+
 	mkdir -p "$pkgdir"/usr/bin
 	mkdir -p "$pkgdir"/usr/lib/voc
+
 	if [ -d "install" ]; then
 		cp -r install/bin/* "$pkgdir"/usr/bin/
 		cp -r install/lib/* "$pkgdir"/usr/lib/voc/
 	else
-		echo "ERROR: Build finished but 'install' directory is missing!"
+		echo "ERROR: 'install' directory was not created!"
 		return 1
 	fi
 }
+
 sha512sums="
 96482b90c36fa1e237c459bdc0fa837f14655bab8e144c6f5a4d94ac721789b7330bfbd41a7e5ce7a7c0e85e201e55bcd124a28bf659af53d7251fcad1d1d80b  vishap-oberon-compiler-2.1.2.tar.gz
 "
