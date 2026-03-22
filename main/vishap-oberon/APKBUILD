@@ -19,7 +19,7 @@ prepare() {
 
 build() {
 	cd "$builddir"
-	make -j1 -f makefile full CC="tcc -B/usr/lib/tcc"
+	make -j1 full CC="tcc -B/usr/lib/tcc -Dalloca=__builtin_alloca"
 }
 
 package() {
