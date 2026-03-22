@@ -40,6 +40,7 @@ jobs:
             
             echo "${{ secrets.ALPINE_PRIVKEY }}" > /home/builder/.abuild/$PRIVKEY_NAME
             cp "$PUBKEY" /home/builder/.abuild/$PUBKEY_NAME
+            cp "$PUBKEY" /etc/apk/keys/$PUBKEY_NAME
             
             echo "PACKAGER_PRIVKEY=/home/builder/.abuild/$PRIVKEY_NAME" > /home/builder/.abuild/abuild.conf
             
