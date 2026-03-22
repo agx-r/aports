@@ -1,12 +1,14 @@
 # Contributor: agx <agxr@tuta.io>
 # Maintainer: agx <agxr@tuta.io>
+# Contributor: Your Name <your@email.com>
+# Maintainer: Your Name <your@email.com>
 pkgname=ayugram-desktop
 pkgver=6.3.10
 pkgrel=0
 pkgdesc="Desktop Telegram client with good customization and Ghost mode"
 options="!check"
 url="https://github.com/AyuGram/AyuGramDesktop"
-arch="x86_64"
+arch="x86_64 aarch64"
 license="GPL-3.0-or-later WITH OpenSSL-exception"
 
 _tdlib_commit=6d74326c5ce53aeb52496f157f0080d9b8515970
@@ -15,7 +17,6 @@ depends="
 	qt6-qtimageformats
 	font-opensans
 	abseil-cpp
-	ada
 	ffmpeg
 	hunspell
 	libavif
@@ -24,7 +25,6 @@ depends="
 	lz4
 	minizip
 	openal-soft
-	openh264
 	openssl
 	pipewire
 	protobuf
@@ -44,7 +44,6 @@ makedepends="
 	tg_owt-dev
 	gperf
 	boost-dev
-	fmt-dev
 	abseil-cpp-dev
 	ffmpeg-dev
 	gobject-introspection-dev
@@ -76,52 +75,102 @@ makedepends="
 source="
 	AyuGram-$pkgver.tar.gz::https://github.com/AyuGram/AyuGramDesktop/archive/refs/tags/v$pkgver.tar.gz
 	td-$_tdlib_commit.tar.gz::https://github.com/tdlib/td/archive/$_tdlib_commit.tar.gz
+	cmake_helpers-ba366ade.tar.gz::https://github.com/desktop-app/cmake_helpers/archive/ba366ade3e70c64d1dd854382abd74f532ba41a1.tar.gz
+	cppgir-2a7d9cef68202a29d5e8a679ce9519c76eb26dc3.tar.gz::https://gitlab.com/mnauw/cppgir/-/archive/2a7d9cef68202a29d5e8a679ce9519c76eb26dc3/cppgir-2a7d9cef68202a29d5e8a679ce9519c76eb26dc3.tar.gz
+	expected-lite-95b9cb01.tar.gz::https://github.com/martinmoene/expected-lite/archive/95b9cb015fa17baa749c2b396b335906e1596a9e.tar.gz
+	codegen-1c919609.tar.gz::https://github.com/desktop-app/codegen/archive/1c919609d4573f2be91dafef923f8f9e2c08cdff.tar.gz
+	lib_base-444ab334.tar.gz::https://github.com/desktop-app/lib_base/archive/444ab33475734485dcc183a5fb86875c134fac8b.tar.gz
+	lib_crl-a41edfcf.tar.gz::https://github.com/desktop-app/lib_crl/archive/a41edfcfa8c04057deb8a1a38fca145248a9421a.tar.gz
+	lib_icu-fd92c318.tar.gz::https://github.com/AyuGram/lib_icu/archive/fd92c3184598c4e64c10c1961a3c767d43b10b5c.tar.gz
+	lib_lottie-99d8cc4d.tar.gz::https://github.com/desktop-app/lib_lottie/archive/99d8cc4d1820960fbcdafc574f1894073b14b75a.tar.gz
+	lib_qr-6fdf6046.tar.gz::https://github.com/desktop-app/lib_qr/archive/6fdf60461444ba150e13ac36009c0ffce72c4c83.tar.gz
+	lib_rpl-c57cccff.tar.gz::https://github.com/desktop-app/lib_rpl/archive/c57cccffb01d85570decd7fccb88419c9a682e63.tar.gz
+	lib_spellcheck-476bb430.tar.gz::https://github.com/desktop-app/lib_spellcheck/archive/476bb43025449ccbd815a14895e9321695a1a177.tar.gz
+	lib_storage-ccdc7254.tar.gz::https://github.com/desktop-app/lib_storage/archive/ccdc72548a5065b5991b4e06e610d76bc4f6023e.tar.gz
+	lib_tl-6a1bf6bb.tar.gz::https://github.com/AyuGram/lib_tl/archive/6a1bf6bb45ba803d2a9be76db8aead45cb4732d5.tar.gz
+	lib_ui-b1710a65.tar.gz::https://github.com/AyuGram/lib_ui/archive/b1710a65b73a09937d4cfef3f84cb39b5848ad5d.tar.gz
+	lib_webrtc-553102f8.tar.gz::https://github.com/desktop-app/lib_webrtc/archive/553102f8c244609253720e7a03c2ea2d3c7fee8e.tar.gz
+	lib_webview-55ea1175.tar.gz::https://github.com/desktop-app/lib_webview/archive/55ea11759711d377216eae6c45dad0bc49b67398.tar.gz
+	GSL-87f9d768.tar.gz::https://github.com/desktop-app/GSL/archive/87f9d768866548b5b86e72be66c60c5abd4d9b37.tar.gz
+	QR-Code-generator-720f62bd.tar.gz::https://github.com/nayuki/QR-Code-generator/archive/720f62bddb7226106071d4728c292cb1df519ceb.tar.gz
+	cld3-b48dc465.tar.gz::https://github.com/google/cld3/archive/b48dc46512566f5a2d41118c8c1116c4f96dc661.tar.gz
+	swift-corelibs-libdispatch-886ca22f.tar.gz::https://github.com/apple/swift-corelibs-libdispatch/archive/886ca22f659c53dae66a40ee8266c7aae9bb97cd.tar.gz
+	expected-292eff8b.tar.gz::https://github.com/TartanLlama/expected/archive/292eff8bd8ee230a7df1d6a1c00c4ea0eb2f0362.tar.gz
+	fcitx5-qt-c743b12e.tar.gz::https://github.com/fcitx/fcitx5-qt/archive/c743b12e6780edf1dcfe9071531c80f050cacb95.tar.gz
+	hime-9b3e6f9a.tar.gz::https://github.com/hime-ime/hime/archive/9b3e6f9ab59d1fe4d9de73d3bf0fed7789f921c5.tar.gz
+	hunspell-22c3381e.tar.gz::https://github.com/hunspell/hunspell/archive/22c3381e2066bed616250d373fc5c935598b564a.tar.gz
+	kcoreaddons-fd84da51.tar.gz::https://github.com/KDE/kcoreaddons/archive/fd84da51b554eac25e35b1e3f373edaab3029b15.tar.gz
+	kimageformats-df82311a.tar.gz::https://github.com/KDE/kimageformats/archive/df82311a1081e576c4ac020204578bb8a81b21ec.tar.gz
+	libprisma-23b0d70f.tar.gz::https://github.com/desktop-app/libprisma/archive/23b0d70f9709da9b38561d5706891a134d18df76.tar.gz
+	lz4-5ff83968.tar.gz::https://github.com/lz4/lz4/archive/5ff839680134437dbf4678f3d0c7b371d84f4964.tar.gz
+	nimf-498ec7ff.tar.gz::https://github.com/hamonikr/nimf/archive/498ec7ffab3ac140c2469638a14451788f03e798.tar.gz
+	range-v3-a81477931.tar.gz::https://github.com/ericniebler/range-v3/archive/a81477931a8aa2ad025c6bda0609f38e09e4d7ec.tar.gz
+	range-v3-ghpages-2dae74bb.tar.gz::https://github.com/ericniebler/range-v3/archive/2dae74bb693e42d850fb0adcc9045c5b71fbdeae.tar.gz
+	rlottie-8c69fc20.tar.gz::https://github.com/desktop-app/rlottie/archive/8c69fc20cf2e150db304311f1233a4b55a8892d7.tar.gz
+	tgcalls-24876ebc.tar.gz::https://github.com/TelegramMessenger/tgcalls/archive/24876ebca7da10f92dc972225734337f9e793054.tar.gz
+	xdg-desktop-portal-23a76c39.tar.gz::https://github.com/flatpak/xdg-desktop-portal/archive/23a76c392170dbbd26230f85ef56c3a57e52b857.tar.gz
+	xxHash-bbb27a5e.tar.gz::https://github.com/Cyan4973/xxHash/archive/bbb27a5efb85b92a0486cf361a8635715a53f6ba.tar.gz
 	"
 
 builddir="$srcdir/AyuGramDesktop-$pkgver"
 
-
-_module_name() {
-	local url="$1"
-	local host filename name commit
-	host=$(echo "$url" | cut -d/ -f3)
-	name=$(echo "$url" | cut -d/ -f5)
-	commit="${filename%%.*}"
-	case "$host" in
-		gitlab.com) echo "$commit" ;;
-		*)          echo "$name-$commit" ;;
-	esac
-}
+# Маппинг: путь субмодуля -> имя каталога в srcdir после распаковки
+# (имя = <reponame>-<commit>)
+_module_map="
+cmake:cmake_helpers-ba366ade3e70c64d1dd854382abd74f532ba41a1
+cmake/external/glib/cppgir:2a7d9cef68202a29d5e8a679ce9519c76eb26dc3
+cmake/external/glib/cppgir/expected-lite:expected-lite-95b9cb015fa17baa749c2b396b335906e1596a9e
+Telegram/codegen:codegen-1c919609d4573f2be91dafef923f8f9e2c08cdff
+Telegram/lib_base:lib_base-444ab33475734485dcc183a5fb86875c134fac8b
+Telegram/lib_crl:lib_crl-a41edfcfa8c04057deb8a1a38fca145248a9421a
+Telegram/lib_icu:lib_icu-fd92c3184598c4e64c10c1961a3c767d43b10b5c
+Telegram/lib_lottie:lib_lottie-99d8cc4d1820960fbcdafc574f1894073b14b75a
+Telegram/lib_qr:lib_qr-6fdf60461444ba150e13ac36009c0ffce72c4c83
+Telegram/lib_rpl:lib_rpl-c57cccffb01d85570decd7fccb88419c9a682e63
+Telegram/lib_spellcheck:lib_spellcheck-476bb43025449ccbd815a14895e9321695a1a177
+Telegram/lib_storage:lib_storage-ccdc72548a5065b5991b4e06e610d76bc4f6023e
+Telegram/lib_tl:lib_tl-6a1bf6bb45ba803d2a9be76db8aead45cb4732d5
+Telegram/lib_ui:lib_ui-b1710a65b73a09937d4cfef3f84cb39b5848ad5d
+Telegram/lib_webrtc:lib_webrtc-553102f8c244609253720e7a03c2ea2d3c7fee8e
+Telegram/lib_webview:lib_webview-55ea11759711d377216eae6c45dad0bc49b67398
+Telegram/ThirdParty/GSL:GSL-87f9d768866548b5b86e72be66c60c5abd4d9b37
+Telegram/ThirdParty/QR:QR-Code-generator-720f62bddb7226106071d4728c292cb1df519ceb
+Telegram/ThirdParty/cld3:cld3-b48dc46512566f5a2d41118c8c1116c4f96dc661
+Telegram/ThirdParty/dispatch:swift-corelibs-libdispatch-886ca22f659c53dae66a40ee8266c7aae9bb97cd
+Telegram/ThirdParty/expected:expected-292eff8bd8ee230a7df1d6a1c00c4ea0eb2f0362
+Telegram/ThirdParty/fcitx5-qt:fcitx5-qt-c743b12e6780edf1dcfe9071531c80f050cacb95
+Telegram/ThirdParty/hime:hime-9b3e6f9ab59d1fe4d9de73d3bf0fed7789f921c5
+Telegram/ThirdParty/hunspell:hunspell-22c3381e2066bed616250d373fc5c935598b564a
+Telegram/ThirdParty/kcoreaddons:kcoreaddons-fd84da51b554eac25e35b1e3f373edaab3029b15
+Telegram/ThirdParty/kimageformats:kimageformats-df82311a1081e576c4ac020204578bb8a81b21ec
+Telegram/ThirdParty/libprisma:libprisma-23b0d70f9709da9b38561d5706891a134d18df76
+Telegram/ThirdParty/lz4:lz4-5ff839680134437dbf4678f3d0c7b371d84f4964
+Telegram/ThirdParty/nimf:nimf-498ec7ffab3ac140c2469638a14451788f03e798
+Telegram/ThirdParty/range-v3:range-v3-a81477931a8aa2ad025c6bda0609f38e09e4d7ec
+Telegram/ThirdParty/range-v3/doc/gh-pages:range-v3-2dae74bb693e42d850fb0adcc9045c5b71fbdeae
+Telegram/ThirdParty/rlottie:rlottie-8c69fc20cf2e150db304311f1233a4b55a8892d7
+Telegram/ThirdParty/tgcalls:tgcalls-24876ebca7da10f92dc972225734337f9e793054
+Telegram/ThirdParty/xdg-desktop-portal:xdg-desktop-portal-23a76c392170dbbd26230f85ef56c3a57e52b857
+Telegram/ThirdParty/xxHash:xxHash-bbb27a5efb85b92a0486cf361a8635715a53f6ba
+"
 
 prepare() {
 	cd "$builddir"
 
-	_fill_modules() {
-		local dir="${1:-.}"
-		find "$dir" -type f -name .gitmodules | while read -r gitmodules; do
-			local prefix
-			prefix="$(dirname "$gitmodules")"
-			[ "$prefix" = "." ] && prefix="" || prefix="$prefix/"
-			grep path "$gitmodules" | awk '{print $3}' | while read -r p; do
-				p="${p%$'\r'}"
-				[ -z "$p" ] && continue
-				local target="$prefix$p"
-				local basename
-				basename="$(basename "$target")"
-				local found
-				found="$(find "$srcdir" -maxdepth 1 -type d -name "${basename}-*" | head -n1)"
-				if [ -n "$found" ]; then
-					echo "Filling $target with $found"
-					cp -r "$found/." "$target"
-					_fill_modules "$target"
-				else
-					echo "WARNING: submodule dir not found for $target (basename=$basename)"
-				fi
-			done
-		done
-	}
-	_fill_modules
+	echo "$_module_map" | grep -v '^$' | while IFS=: read -r target dirname; do
+		local dest="$builddir/$target"
+		local src="$srcdir/$dirname"
+		if [ -d "$src" ]; then
+			echo "Filling $target ..."
+			mkdir -p "$dest"
+			cp -r "$src/." "$dest"
+		else
+			echo "ERROR: $src not found for $target"
+			return 1
+		fi
+	done
 
+	# Исправление для protobuf
 	sed -i 's/find_package(protobuf REQUIRED)/find_package(protobuf REQUIRED CONFIG)/' \
 		Telegram/ThirdParty/cld3/CMakeLists.txt
 }
@@ -153,8 +202,42 @@ build() {
 package() {
 	DESTDIR="$pkgdir" cmake --install build
 }
-
 sha512sums="
 fcdf5ddcc9fab9d08ae0185269e14882c525c590f729e87f5530cf7cdc558802d2ce01add2694ee9a0edb4ab8fca3397da184234ad0001de1bdf63adb282c301  AyuGram-6.3.10.tar.gz
 126df6295aa2f2a5767c674edf9e578e376d816c620365945abc86e9884a7a2593856bce7d14afceaf9fc798c61da6806a50f01ad1171b74264f0687f467d9b1  td-6d74326c5ce53aeb52496f157f0080d9b8515970.tar.gz
+03f709a91eb4685dde699f380a7812d96a548f24ed4378f9e54a02dca4b8658612412f30f39aa214b8048f7af828955f09c9d018687b2796c811595949af352f  cmake_helpers-ba366ade.tar.gz
+727e8ed433db5437fd197fd16c9f3d453ea42077d26b30206e9b83c4b4c08581d1defe72a4f8ed435954875916f0cbf420824fc00aecd25b564f06e55d61ce58  cppgir-2a7d9cef68202a29d5e8a679ce9519c76eb26dc3.tar.gz
+f4d46daf45d857137d9b026fdeac3101c7707868aa133b696ee3c5cfc208ea402c71db73882eeece0c2eb6271ee06495c7afde4eefb20de0a98ad9bc5727dc35  expected-lite-95b9cb01.tar.gz
+3cc109b354bae1e1252a9299bdfb6719452679c58c47ab2563bcc89aa017c102091fe8f771687ad215736a6166407b934ce5172847e88c25fbf820243f8efaba  codegen-1c919609.tar.gz
+bf76876f66803d6e9626585793039588e81c4f0d58b1de40251f4c5b7223bd7947f83c17086863df4897b0a96c8eefb1f63185ad8aad21d353b4122ccda7db19  lib_base-444ab334.tar.gz
+cc0187f8188be6fa3b83cab003c8b3f2bad0972b46749c3c237b1e3aebd4ceac1d1b54a58581d982c8af269bc25cd7c5e7b66a51f48efd88639edb9dcec3fbc4  lib_crl-a41edfcf.tar.gz
+a0fc01edbd37594ff004f9bd138e153e7cf96298d0315ba1dc587912f440860da9ae4766c059df6a3520c4b6f39503fbab810368b73133e286c515470fac6eca  lib_icu-fd92c318.tar.gz
+73f9cd34930f625905529d50adadf3ab239ab0b6e446dd0d2c18ec10bd000fce3619dbc33ad27c5504ea5b2a1bb564db873ec265ffca2781f85c7cf2703b845e  lib_lottie-99d8cc4d.tar.gz
+8409e1d40f9a7200cc2d05c06de18e386318750fa2d4f4351ea061cac374cd0f2e9fbd6419b8e8710f0ec79fddf1903f6b46e20f2b8d36346e84fb290eb34fdd  lib_qr-6fdf6046.tar.gz
+6a927912f13de2693e46ff2a0494f6ce13cc136ee8672c1c3d0a1aa7f70f54d430425ac6a5a84e5766c82223a0d05587ba283e3ff2914305c91ce61de30f8d34  lib_rpl-c57cccff.tar.gz
+ac34aea1b6d665a941d30e3749ebece188ab874d4b5946e293c533ed2db893c77676cc1a90b974781159e3fe61027a6d1a7754542997fb18dab71023a27cc7af  lib_spellcheck-476bb430.tar.gz
+6b9306aed685ac8765743c64c6ac0593f497ffd9b8d74e433c24415b20699c2b69f4a943946325da9173cef60ee598ce06baca3ecf32bbef389efb188bdd618a  lib_storage-ccdc7254.tar.gz
+ee80cf5cdc370c12b6c3bf2ad82d75500663c8b385724cbc9bd8560f165663cc73e91769565c88772319c58d08f5864264601f181180498b095184e0453c1a6c  lib_tl-6a1bf6bb.tar.gz
+551f3f91bcd9e723f602f5dc124d3cd052a0551be6bb9c509ca747b5e51ea52eb3371986152c4686cd89bdcd6c457c706546d97ea14020b13b51b874a145db4c  lib_ui-b1710a65.tar.gz
+cd5c6b586371fabb5d3b23acfa319b8613bbaef0c9870662010ed44f0ed7726feeb6ce883a538b707149ffec56207911303b33d0d75b3a4fcc2bc99f63e8018b  lib_webrtc-553102f8.tar.gz
+ce725fa364dca5fb2948d9fb70ebcf602d394e22c03222365158dba3c6decdba2f866adabb8053c3f112eecd5debc1568eae49847a65aeb530e84c3e26e22467  lib_webview-55ea1175.tar.gz
+5603a411e905192ffeb1961ded068848191abb48b53a515d9e43954597fec9139cfcec215df491c4bbee9609164fa512a331e651be54d47c1bc9402786a46a67  GSL-87f9d768.tar.gz
+1d262469ee9787c0468577f8574c913afe74c734dcdd50da26cadd9f69b4588038ee2837f4341ca84b0ceade59b15350a7aca586d27ed0bb05c77464f8ee18cd  QR-Code-generator-720f62bd.tar.gz
+c3650ffbf5855aaf04d03930f01c6efd76e1f2b2d47365348721f16531a14653ae5b3aff8fefa8e5fa1c769fdf1a9b441a88bc687f97f8c579b84f17c6984c9e  cld3-b48dc465.tar.gz
+007ac56effdb20b049bdb96afe78a4def3f77f33992af57cb707defd899816045d47b2695644a099f65bb9871ec36ab35b3d2072c48c9bac83036551384dddc5  swift-corelibs-libdispatch-886ca22f.tar.gz
+f937fe4fe64ad5dbb405b6f53188188601599f25528dac0282922036487ffe11c23d4dba953294e63a27d539be259e12dc4ff597f84e4281926e90dfcf431318  expected-292eff8b.tar.gz
+9e08db4cb9d43839d2b64f39d87fb3cb6b8540583face3e9fd1d61eac44baa3e6dbe169037b27805967965997c2338b095bfbec76413f054b3c5583a38462813  fcitx5-qt-c743b12e.tar.gz
+275621b734056f87449bec2fc5644fa2e2abb6a84b91c8935989c630d4aefafe132a67dd3fc642c9e485528984d62c864c339bc4d9b4bf9353152498b6f6cbcf  hime-9b3e6f9a.tar.gz
+ea3c34270f3fb7fa1d9b4127a9f4bf411bb78cc02853957bdbb4ca278f517c399f2e483c744eb4a21fc1082800d6555f72a81e5d4d2604a31494ceea0e0416c4  hunspell-22c3381e.tar.gz
+e86f977b9bd68f0d392bf6230259a1e47e4c459f9d0e4d38a92200e2d047b30d1c301c9b037da1d89c74cbff612179429a6588c2e236289c1c9772e0d0d59409  kcoreaddons-fd84da51.tar.gz
+826c8ccf9d32bb7062480aa5bfed3a2b2efc5838d5ba6aa612ca97c9714b9d5843edd4266c2693eebb95b765359a4a2436f0704224e6ff3b0312383bb93151aa  kimageformats-df82311a.tar.gz
+52ea6a9e3464e844896da35485cb010532778565b36f7a09ddb937437101b89582fdf210bb64f35e7c60d71e8661c7bae749be1379aae2f3cadf20b3a86afdf3  libprisma-23b0d70f.tar.gz
+4ac5fb8fcaa354a112daab66aefd931acb46c7906f7d4cb840f78a89d8eb872b17aa5fb1d36b499d398c8053df91945d5c33270e52067c742949810d8812dfe0  lz4-5ff83968.tar.gz
+3d593402b1f4b78af2440c791ca5f9788c9a6816466824559c0aa8767cc7f535a05826fbb909d156e61a1d929400b6363868b410f4e07e64d7bb0ce62cda2d90  nimf-498ec7ff.tar.gz
+e58030bc7c281e90298025dc21fed9bdabda358cd847b59e5b58feb3e0b93fcf6398e3b8e2912e45deeed67f454c08d4fc4df7f8d0dc378b437612f15c0832fe  range-v3-a81477931.tar.gz
+717c33773271651062e2c2238ef125e96131ba007faa0443b151f1ea81762497571154c9b198e2d65104fd2af7a720f2106c1829777235d7f559c8754a6f044b  range-v3-ghpages-2dae74bb.tar.gz
+e593179d29704d247e1a1671d111a625cb3683c4975173b01ada45f2b531d57130d2c8b33fffd52f2a5ea83b7b73aac9cac90b5748497eaf97ebfd0f86454bb2  rlottie-8c69fc20.tar.gz
+bd945cb04397e84d96cc13df5cf67c194c6e7f880843405b6759b7a14db23dfb376b60563a34b1a8b6db0f2be491ea2764ea94dc940762fd4a284da193b0c7d9  tgcalls-24876ebc.tar.gz
+051e9fcfcbbeb0c8e787b58da9c716841a2c62f03a2a623b720f0e7a3ccf16c561da002783324f679154f96654bf0e50f4f5c8e25e28b6918788b16bdd3c13ae  xdg-desktop-portal-23a76c39.tar.gz
+fc53b5461d5560a600c78145aa645cf20ec112216efefa98ae2c9e4f480ea3723930abacee825aadbdcd9b3712963d20da17ccc8f3ceb885c9c05647c9e817fc  xxHash-bbb27a5e.tar.gz
 "
