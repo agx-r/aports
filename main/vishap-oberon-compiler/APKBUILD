@@ -1,9 +1,9 @@
 # Contributor: agx <agxr@tuta.io>
 # Maintainer: agx <agxr@tuta.io>
-pkgname="voc"
+pkgname="vishap-oberon-compiler"
 pkgver="2.1.2"
 pkgrel=0
-pkgdesc="Vishap Oberon Compiler"
+pkgdesc="Vishap Oberon Compiler (VOC)"
 url="https://github.com/vishapoberon/compiler"
 arch="x86_64"
 license="GPL-3.0"
