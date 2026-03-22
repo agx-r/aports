@@ -6,7 +6,7 @@ pkgrel=0
 pkgdesc="Desktop Telegram client with good customization and Ghost mode"
 options="!check"
 url="https://github.com/AyuGram/AyuGramDesktop"
-arch="x86_64 aarch64"
+arch="x86_64"
 license="GPL-3.0-or-later WITH OpenSSL-exception"
 
 _tdlib_commit=6d74326c5ce53aeb52496f157f0080d9b8515970
