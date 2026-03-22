@@ -68,31 +68,31 @@ jobs:
           name: packages-${{ matrix.arch }}
           path: output_packages/
 
-publish:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout
-        uses: actions/checkout@v4
+  publish:
+      needs: build
+      runs-on: ubuntu-latest
+      steps:
+        - name: checkout
+          uses: actions/checkout@v4
 
-      - name: download and merge artifacts
-        uses: actions/download-artifact@v4
-        with:
-          pattern: packages-*
-          path: public/
-          merge-multiple: true
+        - name: download and merge artifacts
+          uses: actions/download-artifact@v4
+          with:
+            pattern: packages-*
+            path: public/
+            merge-multiple: true
 
-      - name: prepare keys
-        run: |
-          mkdir -p public/keys
-          cp keys/*.pub public/keys/
+        - name: prepare keys
+          run: |
+            mkdir -p public/keys
+            cp keys/*.pub public/keys/
           
-          echo "gh-pages:"
-          find public/ -type f
+            echo "gh-pages:"
+            find public/ -type f
 
-      - name: deploy to gh-pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
-          force_orphan: true
+        - name: deploy to gh-pages
+          uses: peaceiris/actions-gh-pages@v3
+          with:
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            publish_dir: ./public
+            force_orphan: true
