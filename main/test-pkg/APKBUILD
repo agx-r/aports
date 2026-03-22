@@ -4,14 +4,14 @@ pkgname="test-pkg"
 pkgver="1.0.0"
 pkgrel=0
 pkgdesc="to check if it works"
-url="https://github.com/agx-r/agx-r"
+url="https://github.com/agx-r/aports"
 arch="all"
 license="MIT"
 depends=""
 source=""
 
 build() {
-    echo "echo 'it works'" > hello.sh
+    echo -e "#!/bin/sh\necho 'it works'" > hello.sh
 }
 
 package() {
