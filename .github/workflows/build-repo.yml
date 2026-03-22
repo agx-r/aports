@@ -1,0 +1,102 @@
+name: build
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - arch: x86_64
+            platform: linux/amd64
+          - arch: riscv64
+            platform: linux/riscv64
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: setup qemu
+        uses: docker/setup-qemu-action@v3
+
+      - name: build pkgs
+        run: |
+          mkdir -p output_packages
+          
+          docker run --rm -v ${{ github.workspace }}:/work -w /work --platform ${{ matrix.platform }} alpine:latest sh -c '
+            apk add alpine-sdk sudo
+            
+            adduser -D builder && addgroup builder abuild
+            echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+            
+            mkdir -p /home/builder/.abuild
+            echo "${{ secrets.ALPINE_PRIVKEY }}" > /home/builder/.abuild/repo.rsa
+            echo "PACKAGER_PRIVKEY=/home/builder/.abuild/repo.rsa" > /home/builder/.abuild/abuild.conf
+            chown -R builder:builder /home/builder/.abuild
+            
+            chown -R builder:builder /work
+            
+            for pkg_dir in $(find . -mindepth 2 -name APKBUILD -exec dirname {} \;); do
+              echo "Building in $pkg_dir for ${{ matrix.arch }}..."
+              su builder -c "cd $pkg_dir && abuild -r -c" || exit 1
+            done
+            
+            cp -r /home/builder/packages/builder/${{ matrix.arch }}/* /work/output_packages/ || true
+          '
+
+      - name: upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages-${{ matrix.arch }}
+          path: output_packages/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: packages-*
+          path: artifacts/
+
+      - name: generate index and sign
+        run: |
+          mkdir -p public/keys
+          cp keys/*.pub public/keys/
+          
+          docker run --rm -v ${{ github.workspace }}:/work -w /work alpine:latest sh -c '
+            apk add alpine-sdk
+            
+            mkdir -p ~/.abuild
+            echo "${{ secrets.ALPINE_PRIVKEY }}" > ~/.abuild/repo.rsa
+            
+            for arch_dir in /work/artifacts/packages-*; do
+              if [ -d "$arch_dir" ]; then
+                arch=$(basename "$arch_dir" | sed "s/packages-//")
+                echo "Processing index for $arch..."
+                
+                mkdir -p "/work/public/$arch"
+                cp "$arch_dir"/*.apk "/work/public/$arch/" 2>/dev/null || true
+                
+                cd "/work/public/$arch"
+                if ls *.apk >/dev/null 2>&1; then
+                  apk index -o APKINDEX.tar.gz *.apk
+                  abuild-sign -k ~/.abuild/repo.rsa APKINDEX.tar.gz
+                fi
+              fi
+            done
+          '
+
+      - name: deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          force_orphan: true
