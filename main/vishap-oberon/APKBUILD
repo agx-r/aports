@@ -14,7 +14,7 @@ builddir="$srcdir/compiler-$pkgver"
 prepare() {
 	default_prepare
 	cd "$builddir"
-	sed -i "s/git rev-parse --abbrev-ref HEAD/echo v$pkgver/g" Makefile
+	sed -i "s/git rev-parse --abbrev-ref HEAD/echo v$pkgver/g" makefile
 }
 
 build() {
