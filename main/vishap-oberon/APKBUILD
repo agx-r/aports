@@ -1,6 +1,5 @@
 # Contributor: agx <agxr@tuta.io>
 # Maintainer: agx <agxr@tuta.io>
-
 pkgname="vishap-oberon-compiler"
 pkgver="2.1.2"
 pkgrel=0
@@ -8,9 +7,8 @@ pkgdesc="Vishap Oberon Compiler (VOC) built with TCC"
 url="https://github.com/vishapoberon/compiler"
 arch="all"
 license="GPL-3.0"
-makedepends="build-base tcc tcc-libs"
+makedepends="build-base tcc tcc-libs-static"
 source="$pkgname-$pkgver.tar.gz::https://github.com/vishapoberon/compiler/archive/refs/tags/v$pkgver.tar.gz"
-
 builddir="$srcdir/compiler-$pkgver"
 
 prepare() {
@@ -21,21 +19,17 @@ prepare() {
 
 build() {
 	cd "$builddir"
-
-	make -j1 full CC="tcc"
+	make -j1 -f makefile full CC="tcc -B/usr/lib/tcc"
 }
 
 package() {
 	cd "$builddir"
-
 	mkdir -p "$pkgdir"/usr/bin
 	mkdir -p "$pkgdir"/usr/lib/voc
-
 	if [ -d "install" ]; then
 		cp -r install/bin/* "$pkgdir"/usr/bin/
 		cp -r install/lib/* "$pkgdir"/usr/lib/voc/
 	else
-		echo "ERROR: 'install' directory missing"
 		return 1
 	fi
 }
