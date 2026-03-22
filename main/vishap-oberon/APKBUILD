@@ -9,19 +9,21 @@ arch="all"
 license="GPL-3.0-or-later"
 makedepends="build-base"
 source="$pkgname-$pkgver.tar.gz::https://github.com/vishapoberon/compiler/archive/refs/tags/v$pkgver.tar.gz"
-
 builddir="$srcdir/compiler-$pkgver"
 
 prepare() {
 	default_prepare
 	cd "$builddir"
-	# Заменяем git-версию на статичную
 	sed -i "s/git rev-parse --abbrev-ref HEAD/echo v$pkgver/g" makefile
 }
 
 build() {
 	cd "$builddir"
-	export CFLAGS="$CFLAGS -std=gnu89 -fpermissive -Wno-error=implicit-function-declaration -Wno-error=mismatched-parameter-types -Wno-error=conflicting-types"
+	export CFLAGS="$CFLAGS -std=gnu89 -fpermissive \
+		-Wno-error=conflicting-types \
+		-Wno-error=mismatched-parameter-types \
+		-Wno-error=implicit-function-declaration"
+
 	make -j1 -f makefile full
 }
 
@@ -33,7 +35,7 @@ package() {
 		cp -r install/bin/* "$pkgdir"/usr/bin/
 		cp -r install/lib/* "$pkgdir"/usr/lib/voc/
 	else
-		echo "err: install directory not found!"
+		echo "ERROR: Build finished but 'install' directory is missing!"
 		return 1
 	fi
 }
