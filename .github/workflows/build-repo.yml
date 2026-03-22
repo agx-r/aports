@@ -68,46 +68,27 @@ jobs:
           name: packages-${{ matrix.arch }}
           path: output_packages/
 
-  publish:
+publish:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - name: checkout
         uses: actions/checkout@v4
 
-      - name: download artifacts
+      - name: download and merge artifacts
         uses: actions/download-artifact@v4
         with:
           pattern: packages-*
-          path: artifacts/
+          path: public/
+          merge-multiple: true
 
-      - name: generate index and sign
+      - name: prepare keys
         run: |
           mkdir -p public/keys
           cp keys/*.pub public/keys/
           
-          docker run --rm -v ${{ github.workspace }}:/work -w /work alpine:latest sh -c '
-            apk add alpine-sdk
-            
-            mkdir -p ~/.abuild
-            echo "${{ secrets.ALPINE_PRIVKEY }}" > ~/.abuild/repo.rsa
-            
-            for arch_dir in /work/artifacts/packages-*; do
-              if [ -d "$arch_dir" ]; then
-                arch=$(basename "$arch_dir" | sed "s/packages-//")
-                echo "Processing index for $arch..."
-                
-                mkdir -p "/work/public/$arch"
-                cp "$arch_dir"/*.apk "/work/public/$arch/" 2>/dev/null || true
-                
-                cd "/work/public/$arch"
-                if ls *.apk >/dev/null 2>&1; then
-                  apk index -o APKINDEX.tar.gz *.apk
-                  abuild-sign -k ~/.abuild/repo.rsa APKINDEX.tar.gz
-                fi
-              fi
-            done
-          '
+          echo "gh-pages:"
+          find public/ -type f
 
       - name: deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3
