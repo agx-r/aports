@@ -7,8 +7,8 @@ pkgrel=0
 pkgdesc="Vishap Oberon Compiler (VOC) built with TCC"
 url="https://github.com/vishapoberon/compiler"
 arch="all"
-license="GPL-3.0-or-later"
-makedepends="build-base tcc"
+license="GPL-3.0"
+makedepends="build-base tcc tcc-libs"
 source="$pkgname-$pkgver.tar.gz::https://github.com/vishapoberon/compiler/archive/refs/tags/v$pkgver.tar.gz"
 
 builddir="$srcdir/compiler-$pkgver"
