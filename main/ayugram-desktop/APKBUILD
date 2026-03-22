@@ -155,6 +155,6 @@ package() {
 }
 
 sha512sums="
-SKIP  AyuGram-$pkgver.tar.gz
-SKIP  td-$_tdlib_commit.tar.gz
+fcdf5ddcc9fab9d08ae0185269e14882c525c590f729e87f5530cf7cdc558802d2ce01add2694ee9a0edb4ab8fca3397da184234ad0001de1bdf63adb282c301  AyuGram-6.3.10.tar.gz
+126df6295aa2f2a5767c674edf9e578e376d816c620365945abc86e9884a7a2593856bce7d14afceaf9fc798c61da6806a50f01ad1171b74264f0687f467d9b1  td-6d74326c5ce53aeb52496f157f0080d9b8515970.tar.gz
 "
