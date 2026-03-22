@@ -1,0 +1,32 @@
+# Contributor: agx <agxr@tuta.io>
+# Maintainer: agx <agxr@tuta.io>
+pkgname="vishap-oberon-compiler"
+_pkgname="compiler"
+pkgver="2.1.2"
+pkgrel=0
+pkgdesc="Vishap Oberon Compiler (VOC)"
+url="https://github.com/vishapoberon/compiler"
+arch="all"
+license="GPL-3.0"
+depends=""
+makedepends="build-base"
+source="$pkgname-$pkgver.tar.gz::https://github.com/vishapoberon/compiler/archive/refs/tags/v$pkgver.tar.gz"
+builddir="$srcdir/$_pkgname-$pkgver"
+
+prepare() {
+  default_prepare
+  sed -i "s/git rev-parse --abbrev-ref HEAD/echo v$pkgver/g" Makefile
+}
+
+build() {
+  make -j1 full
+}
+
+check() {
+	# make full' already checks
+	return 0
+}
+
+package() {
+  make DESTDIR="$pkgdir" PREFIX="/usr" install
+}
