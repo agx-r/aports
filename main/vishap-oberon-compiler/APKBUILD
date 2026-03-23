@@ -18,6 +18,7 @@ prepare() {
 
 build() {
 	cd "$builddir"
+	export INSTALLDIR=/usr/lib/voc
 	make -j1 full CC="tcc -B/usr/lib/tcc -Dalloca=__builtin_alloca"
 }
 
