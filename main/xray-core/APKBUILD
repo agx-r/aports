@@ -1,24 +1,23 @@
 # Maintainer: agx <agxr@tuta.io>
-pkgname="Xray"
+pkgname="xray-core"
 pkgver="26.2.6"
 pkgrel=0
-pkgdesc="Xray-core built with custom gcflags and ldflags"
+pkgdesc="Xray-core"
 url="https://github.com/xtls/xray-core"
 arch="all"
 license="MPL-2.0"
 makedepends="go"
 options="net !strip"
 source="$pkgname-$pkgver.tar.gz::https://github.com/xtls/xray-core/archive/v$pkgver.tar.gz"
-builddir="$srcdir/xray-core-$pkgver"
+builddir="$srcdir/Xray-core-$pkgver"
 build() {
 	cd "$builddir"
 	export CGO_ENABLED=0
 	export GOCACHE="$srcdir/go-cache"
 	export GOPATH="$srcdir/go"
-
-	local _gcflags="all=-l=4"
 	local _ldflags="-X github.com/xtls/xray-core/core.build=v$pkgver -s -w -buildid="
-	go build -v -o "$pkgname" \
+	local _gcflags="all=-l=4"
+	go build -v -o xray-bin \
 		-trimpath \
 		-buildvcs=false \
 		-gcflags="$_gcflags" \
@@ -27,8 +26,8 @@ build() {
 }
 package() {
 	cd "$builddir"
-	install -Dm755 "$pkgname" "$pkgdir/usr/bin/$pkgname"
+	install -Dm755 xray-bin "$pkgdir/usr/bin/xray"
 }
 sha512sums="
-11192582ad479045836c8d02b46040165b2acea653ace2a0694755783203836baa9fc3ea6804cb2326c94d81fa365a2a11c02d091ef0b1adfc680f511c66ad14  Xray-26.2.6.tar.gz
+11192582ad479045836c8d02b46040165b2acea653ace2a0694755783203836baa9fc3ea6804cb2326c94d81fa365a2a11c02d091ef0b1adfc680f511c66ad14  xray-core-26.2.6.tar.gz
 "
