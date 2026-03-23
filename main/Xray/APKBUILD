@@ -1,5 +1,5 @@
 # Maintainer: agx <agxr@tuta.io>
-pkgname="xray"
+pkgname="Xray"
 pkgver="26.2.6"
 pkgrel=0
 pkgdesc="Xray-core built with custom gcflags and ldflags"
