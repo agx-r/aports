@@ -1,9 +1,7 @@
 name: build
-
 on:
   push:
     branches: [ "main" ]
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,10 +13,16 @@ jobs:
             platform: linux/amd64
           - arch: riscv64
             platform: linux/riscv64
-
     steps:
       - name: checkout
         uses: actions/checkout@v4
+
+      - name: checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+        continue-on-error: true
 
       - name: setup qemu
         uses: docker/setup-qemu-action@v3
@@ -27,73 +31,113 @@ jobs:
         run: |
           mkdir -p output_packages
           chmod 777 output_packages
-          
-          docker run --rm -v ${{ github.workspace }}:/work -w /work --platform ${{ matrix.platform }} alpine:latest sh -c '
-            apk add alpine-sdk sudo
-            adduser -D builder && addgroup builder abuild
-            echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-            
-            mkdir -p /home/builder/.abuild
-            PUBKEY=$(ls /work/keys/*.pub | head -n 1)
-            PUBKEY_NAME=$(basename "$PUBKEY")
-            PRIVKEY_NAME="${PUBKEY_NAME%.pub}"
-            
-            echo "${{ secrets.ALPINE_PRIVKEY }}" > /home/builder/.abuild/$PRIVKEY_NAME
-            cp "$PUBKEY" /home/builder/.abuild/$PUBKEY_NAME
-            cp "$PUBKEY" /etc/apk/keys/$PUBKEY_NAME
-            echo "PACKAGER_PRIVKEY=/home/builder/.abuild/$PRIVKEY_NAME" > /home/builder/.abuild/abuild.conf
-            
-            chown -R builder:builder /home/builder/.abuild
-            chown -R builder:builder /work
-            
-            for pkg_dir in /work/main/*; do
-              if [ -f "$pkg_dir/APKBUILD" ]; then
-                echo "building in $pkg_dir for ${{ matrix.arch }}..."
+
+          EXISTING_APKS=""
+          if [ -d gh-pages ]; then
+            EXISTING_APKS=$(find gh-pages/ -name "*.apk" -exec basename {} \; | sort | tr '\n' ' ')
+            echo "Already built packages: $EXISTING_APKS"
+          fi
+
+          docker run --rm \
+            -v ${{ github.workspace }}:/work \
+            -v ${{ github.workspace }}/gh-pages:/gh-pages \
+            -w /work \
+            --platform ${{ matrix.platform }} \
+            alpine:latest sh -c '
+              apk add alpine-sdk sudo
+              adduser -D builder && addgroup builder abuild
+              echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+              mkdir -p /home/builder/.abuild
+              PUBKEY=$(ls /work/keys/*.pub | head -n 1)
+              PUBKEY_NAME=$(basename "$PUBKEY")
+              PRIVKEY_NAME="${PUBKEY_NAME%.pub}"
+
+              echo "'"${{ secrets.ALPINE_PRIVKEY }}"'" > /home/builder/.abuild/$PRIVKEY_NAME
+              cp "$PUBKEY" /home/builder/.abuild/$PUBKEY_NAME
+              cp "$PUBKEY" /etc/apk/keys/$PUBKEY_NAME
+              echo "PACKAGER_PRIVKEY=/home/builder/.abuild/$PRIVKEY_NAME" > /home/builder/.abuild/abuild.conf
+
+              chown -R builder:builder /home/builder/.abuild
+              chown -R builder:builder /work
+
+              for pkg_dir in /work/main/*; do
+                if [ ! -f "$pkg_dir/APKBUILD" ]; then
+                  continue
+                fi
+
+                # Читаем pkgname и pkgver из APKBUILD
+                pkgname=$(grep "^pkgname=" "$pkg_dir/APKBUILD" | cut -d= -f2 | tr -d '"'"'"' ')
+                pkgver=$(grep "^pkgver=" "$pkg_dir/APKBUILD" | cut -d= -f2 | tr -d '"'"'"' ')
+                pkgrel=$(grep "^pkgrel=" "$pkg_dir/APKBUILD" | cut -d= -f2 | tr -d '"'"'"' ')
+
+                # Проверяем, есть ли уже собранный пакет в gh-pages
+                EXPECTED_PKG="${pkgname}-${pkgver}-r${pkgrel}"
+                if find /gh-pages/ -name "${EXPECTED_PKG}*.apk" 2>/dev/null | grep -q .; then
+                  echo "Skipping $pkgname-$pkgver-r$pkgrel (already built)"
+                  continue
+                fi
+
+                echo "Building $pkgname $pkgver-r$pkgrel in $pkg_dir..."
                 su builder -c "cd $pkg_dir && abuild -r -c" || exit 1
+              done
+
+              if [ -d /home/builder/packages ]; then
+                cp -a /home/builder/packages/* /work/output_packages/
+                echo "Build successful. Artifacts:"
+                find /work/output_packages/ -type f
+              else
+                echo "No new packages built."
               fi
-            done
-            
-            if [ -d /home/builder/packages ]; then
-              cp -a /home/builder/packages/* /work/output_packages/
-              echo "build successful. artifacts:"
-              find /work/output_packages/ -type f
-            else
-              echo "/home/builder/packages not found. This is fine."
-              exit 0
-            fi
-          '
+            '
 
       - name: upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: packages-${{ matrix.arch }}
           path: output_packages/
+          if-no-files-found: ignore
 
   publish:
-      needs: build
-      runs-on: ubuntu-latest
-      steps:
-        - name: checkout
-          uses: actions/checkout@v4
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
 
-        - name: download and merge artifacts
-          uses: actions/download-artifact@v4
-          with:
-            pattern: packages-*
-            path: public/
-            merge-multiple: true
+      - name: checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+        continue-on-error: true
 
-        - name: prepare keys
-          run: |
-            mkdir -p public/keys
-            cp keys/*.pub public/keys/
-          
-            echo "gh-pages:"
-            find public/ -type f
+      - name: download and merge artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: packages-*
+          path: new-packages/
+          merge-multiple: true
+        continue-on-error: true
 
-        - name: deploy to gh-pages
-          uses: peaceiris/actions-gh-pages@v3
-          with:
-            github_token: ${{ secrets.GITHUB_TOKEN }}
-            publish_dir: ./public
-            force_orphan: true
+      - name: merge with existing gh-pages
+        run: |
+          mkdir -p public
+          if [ -d gh-pages ]; then
+            cp -a gh-pages/. public/
+            rm -rf public/.git
+          fi
+          if [ -d new-packages ]; then
+            cp -a new-packages/. public/
+          fi
+          mkdir -p public/keys
+          cp keys/*.pub public/keys/
+          echo "Final contents:"
+          find public/ -type f
+
+      - name: deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          force_orphan: true
