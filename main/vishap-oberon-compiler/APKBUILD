@@ -1,7 +1,7 @@
 # Maintainer: agx <agxr@tuta.io>
 pkgname="vishap-oberon-compiler"
 pkgver="2.1.2"
-pkgrel=0
+pkgrel=1
 pkgdesc="Vishap Oberon Compiler (VOC)"
 url="https://github.com/vishapoberon/compiler"
 arch="x86_64"
