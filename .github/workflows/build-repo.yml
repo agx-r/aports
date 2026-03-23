@@ -2,6 +2,7 @@ name: build
 on:
   push:
     branches: [ "main" ]
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -27,69 +28,66 @@ jobs:
       - name: setup qemu
         uses: docker/setup-qemu-action@v3
 
+      - name: write private key
+        run: |
+          echo "${{ secrets.ALPINE_PRIVKEY }}" > ${{ github.workspace }}/.privkey
+          chmod 600 ${{ github.workspace }}/.privkey
+
       - name: build pkgs
         run: |
           mkdir -p output_packages
           chmod 777 output_packages
-
-          EXISTING_APKS=""
-          if [ -d gh-pages ]; then
-            EXISTING_APKS=$(find gh-pages/ -name "*.apk" -exec basename {} \; | sort | tr '\n' ' ')
-            echo "Already built packages: $EXISTING_APKS"
-          fi
 
           docker run --rm \
             -v ${{ github.workspace }}:/work \
             -v ${{ github.workspace }}/gh-pages:/gh-pages \
             -w /work \
             --platform ${{ matrix.platform }} \
-            alpine:latest sh -c '
-              apk add alpine-sdk sudo
-              adduser -D builder && addgroup builder abuild
-              echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+            alpine:latest sh << 'DOCKEREOF'
 
-              mkdir -p /home/builder/.abuild
-              PUBKEY=$(ls /work/keys/*.pub | head -n 1)
-              PUBKEY_NAME=$(basename "$PUBKEY")
-              PRIVKEY_NAME="${PUBKEY_NAME%.pub}"
+          apk add alpine-sdk sudo
+          adduser -D builder && addgroup builder abuild
+          echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-              echo "'"${{ secrets.ALPINE_PRIVKEY }}"'" > /home/builder/.abuild/$PRIVKEY_NAME
-              cp "$PUBKEY" /home/builder/.abuild/$PUBKEY_NAME
-              cp "$PUBKEY" /etc/apk/keys/$PUBKEY_NAME
-              echo "PACKAGER_PRIVKEY=/home/builder/.abuild/$PRIVKEY_NAME" > /home/builder/.abuild/abuild.conf
+          mkdir -p /home/builder/.abuild
+          PUBKEY=$(ls /work/keys/*.pub | head -n 1)
+          PUBKEY_NAME=$(basename "$PUBKEY")
+          PRIVKEY_NAME="${PUBKEY_NAME%.pub}"
 
-              chown -R builder:builder /home/builder/.abuild
-              chown -R builder:builder /work
+          cat /work/.privkey > /home/builder/.abuild/$PRIVKEY_NAME
+          cp "$PUBKEY" /home/builder/.abuild/$PUBKEY_NAME
+          cp "$PUBKEY" /etc/apk/keys/$PUBKEY_NAME
+          echo "PACKAGER_PRIVKEY=/home/builder/.abuild/$PRIVKEY_NAME" > /home/builder/.abuild/abuild.conf
 
-              for pkg_dir in /work/main/*; do
-                if [ ! -f "$pkg_dir/APKBUILD" ]; then
-                  continue
-                fi
+          chown -R builder:builder /home/builder/.abuild
+          chown -R builder:builder /work
 
-                # Читаем pkgname и pkgver из APKBUILD
-                pkgname=$(grep "^pkgname=" "$pkg_dir/APKBUILD" | cut -d= -f2 | tr -d '"'"'"' ')
-                pkgver=$(grep "^pkgver=" "$pkg_dir/APKBUILD" | cut -d= -f2 | tr -d '"'"'"' ')
-                pkgrel=$(grep "^pkgrel=" "$pkg_dir/APKBUILD" | cut -d= -f2 | tr -d '"'"'"' ')
+          for pkg_dir in /work/main/*; do
+            [ -f "$pkg_dir/APKBUILD" ] || continue
 
-                # Проверяем, есть ли уже собранный пакет в gh-pages
-                EXPECTED_PKG="${pkgname}-${pkgver}-r${pkgrel}"
-                if find /gh-pages/ -name "${EXPECTED_PKG}*.apk" 2>/dev/null | grep -q .; then
-                  echo "Skipping $pkgname-$pkgver-r$pkgrel (already built)"
-                  continue
-                fi
+            pkgname=$(. "$pkg_dir/APKBUILD" 2>/dev/null; echo "$pkgname")
+            pkgver=$(. "$pkg_dir/APKBUILD" 2>/dev/null; echo "$pkgver")
+            pkgrel=$(. "$pkg_dir/APKBUILD" 2>/dev/null; echo "$pkgrel")
 
-                echo "Building $pkgname $pkgver-r$pkgrel in $pkg_dir..."
-                su builder -c "cd $pkg_dir && abuild -r -c" || exit 1
-              done
+            EXPECTED="${pkgname}-${pkgver}-r${pkgrel}"
+            if find /gh-pages/ -name "${EXPECTED}*.apk" 2>/dev/null | grep -q .; then
+              echo "Skipping $EXPECTED (already built)"
+              continue
+            fi
 
-              if [ -d /home/builder/packages ]; then
-                cp -a /home/builder/packages/* /work/output_packages/
-                echo "Build successful. Artifacts:"
-                find /work/output_packages/ -type f
-              else
-                echo "No new packages built."
-              fi
-            '
+            echo "Building $EXPECTED in $pkg_dir..."
+            su builder -c "cd $pkg_dir && abuild -r -c" || exit 1
+          done
+
+          if [ -d /home/builder/packages ]; then
+            cp -a /home/builder/packages/* /work/output_packages/
+            echo "Build successful. Artifacts:"
+            find /work/output_packages/ -type f
+          else
+            echo "No new packages built."
+          fi
+
+          DOCKEREOF
 
       - name: upload artifacts
         uses: actions/upload-artifact@v4
