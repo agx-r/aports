@@ -1,7 +1,7 @@
 # Maintainer: agx <agxr@tuta.io>
 pkgname="vishap-oberon-compiler"
 pkgver="2.1.2"
-pkgrel=3
+pkgrel=4
 pkgdesc="Vishap Oberon Compiler (VOC)"
 url="https://github.com/vishapoberon/compiler"
 arch="x86_64"
@@ -24,12 +24,15 @@ build() {
 
 package() {
 	cd "$builddir"
-	mkdir -p "$pkgdir"/usr/bin
 	mkdir -p "$pkgdir"/usr/lib/voc
+	mkdir -p "$pkgdir"/usr/bin
 	if [ -d "install" ]; then
 		cp -r install/bin/* "$pkgdir"/usr/bin/
-		cp -a install/lib/* "$pkgdir"/usr/lib/voc/
+		cp -a install/2 "$pkgdir"/usr/lib/voc/
+		[ -d "install/C" ] && cp -a install/C "$pkgdir"/usr/lib/voc/
+		cp -a install/lib "$pkgdir"/usr/lib/voc/
 	else
+		error "install dir missing"
 		return 1
 	fi
 }
