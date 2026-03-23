@@ -150,8 +150,6 @@ Telegram/ThirdParty/xxHash:xxHash-bbb27a5efb85b92a0486cf361a8635715a53f6ba
 "
 
 prepare() {
-	cd "$builddir"
-
 	echo "$_module_map" | grep -v '^$' | while IFS=: read -r target dirname; do
 		local dest="$builddir/$target"
 		local src="$srcdir/$dirname"
