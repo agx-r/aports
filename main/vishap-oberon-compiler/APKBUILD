@@ -25,10 +25,15 @@ build() {
 package() {
 	cd "$builddir"
 	mkdir -p "$pkgdir"/usr/bin
-	mkdir -p "$pkgdir"/usr/lib/voc
+	mkdir -p "$pkgdir"/usr/lib/voc/2
+	mkdir -p "$pkgdir"/usr/lib/voc/lib
 	if [ -d "install" ]; then
 		cp -r install/bin/* "$pkgdir"/usr/bin/
-		cp -r install/lib/* "$pkgdir"/usr/lib/voc/
+		cp -a install/lib/include "$pkgdir"/usr/lib/voc/2/
+		cp -a install/lib/sym "$pkgdir"/usr/lib/voc/2/
+		cp -a install/lib/obj "$pkgdir"/usr/lib/voc/2/
+		cp -a install/lib/*.a "$pkgdir"/usr/lib/voc/lib/ 2>/dev/null || true
+		cp -a install/lib/*.so "$pkgdir"/usr/lib/voc/lib/ 2>/dev/null || true
 	else
 		return 1
 	fi
