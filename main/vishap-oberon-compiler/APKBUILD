@@ -1,40 +1,47 @@
 # Maintainer: agx <agxr@tuta.io>
 pkgname="vishap-oberon-compiler"
 pkgver="2.1.2"
-pkgrel=4
+pkgrel=5
 pkgdesc="Vishap Oberon Compiler (VOC)"
 url="https://github.com/vishapoberon/compiler"
 arch="x86_64"
-license="GPL-3.0"
+license="GPL-3.0-or-later"
+depends="tcc tcc-libs-static musl-dev"
 makedepends="build-base tcc tcc-libs-static"
 source="$pkgname-$pkgver.tar.gz::https://github.com/vishapoberon/compiler/archive/refs/tags/v$pkgver.tar.gz"
 builddir="$srcdir/compiler-$pkgver"
 
 prepare() {
 	default_prepare
-	cd "$builddir"
 	sed -i "s/git rev-parse --abbrev-ref HEAD/echo v$pkgver/g" makefile
 }
 
 build() {
-	cd "$builddir"
 	export INSTALLDIR=/usr/lib/voc
 	make -j1 full CC="tcc -B/usr/lib/tcc -Dalloca=__builtin_alloca"
 }
 
 package() {
-	cd "$builddir"
-	mkdir -p "$pkgdir"/usr/lib/voc
-	mkdir -p "$pkgdir"/usr/bin
-	if [ -d "install" ]; then
-		cp -r install/bin/* "$pkgdir"/usr/bin/
-		cp -a install/2 "$pkgdir"/usr/lib/voc/
-		[ -d "install/C" ] && cp -a install/C "$pkgdir"/usr/lib/voc/
-		cp -a install/lib "$pkgdir"/usr/lib/voc/
-	else
-		error "install dir missing"
-		return 1
-	fi
+    if [ ! -d "install" ]; then
+        error "install dir missing"
+        return 1
+    fi
+    mkdir -p "$pkgdir"/usr/lib/voc
+    mkdir -p "$pkgdir"/usr/bin
+    cp -r install/bin/* "$pkgdir"/usr/bin/
+    cp -a install/2 "$pkgdir"/usr/lib/voc/
+    [ -d "install/C" ] && cp -a install/C "$pkgdir"/usr/lib/voc/
+    cp -a install/lib "$pkgdir"/usr/lib/voc/
+    mkdir -p "$pkgdir"/usr/lib
+    for _lib in "$pkgdir"/usr/lib/voc/lib/*.so; do
+        ln -s voc/lib/$(basename "$_lib") "$pkgdir"/usr/lib/
+    done
+}
+
+dev() {
+    default_dev
+    mkdir -p "$subpkgdir"/usr/lib/voc/lib
+    mv "$pkgdir"/usr/lib/voc/lib/*.a "$subpkgdir"/usr/lib/voc/lib/
 }
 
 sha512sums="
