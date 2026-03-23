@@ -11,7 +11,6 @@ options="net !strip"
 source="$pkgname-$pkgver.tar.gz::https://github.com/xtls/xray-core/archive/v$pkgver.tar.gz"
 builddir="$srcdir/Xray-core-$pkgver"
 build() {
-	cd "$builddir"
 	export CGO_ENABLED=0
 	export GOCACHE="$srcdir/go-cache"
 	export GOPATH="$srcdir/go"
@@ -26,7 +25,6 @@ build() {
 		./main
 }
 package() {
-	cd "$builddir"
 	install -Dm755 xray-bin "$pkgdir/usr/bin/xray"
 }
 sha512sums="
