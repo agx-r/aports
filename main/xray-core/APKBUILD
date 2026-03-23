@@ -18,6 +18,7 @@ build() {
 	local _ldflags="-X github.com/xtls/xray-core/core.build=v$pkgver -s -w -buildid="
 	local _gcflags="all=-l=4"
 	go build -v -o xray-bin \
+		-buildmode=exe \
 		-trimpath \
 		-buildvcs=false \
 		-gcflags="$_gcflags" \
