@@ -3,7 +3,7 @@
 pkgname=st-wld
 _commit=c63a87cd936c1eeef14c4c21572e5b782d3df4bc
 pkgver=0.7_git20161214
-pkgrel=3
+pkgrel=4
 pkgdesc="st terminal ported to Wayland using wld"
 url="https://github.com/michaelforney/st"
 arch="all"
@@ -12,7 +12,11 @@ depends="ncurses-terminfo-base font-liberation"
 makedepends="fontconfig-dev freetype-dev wayland-dev wayland-protocols libxkbcommon-dev wld-dev pixman-dev"
 subpackages="$pkgname-doc $pkgname-dbg"
 source="st-$_commit.tar.gz::https://github.com/michaelforney/st/archive/$_commit.tar.gz
-        0001-Port-to-wayland-using-wld.patch"
+        0001-Port-to-wayland-using-wld.patch
+        0002-Only-send-SIGHUP-on-close-when-using-PTY.patch
+        0003-Add-support-for-plumbing-via-right-click.patch
+        0004-Start-dmenu-on-bottom-for-ISO-14755-input.patch
+        config.h"
 
 provides="st-virtual"
 provider_priority=100
@@ -37,4 +41,8 @@ package() {
 sha512sums="
 2f744b642a1eadc31d07f70a1c9f5d21aea6de2df6713d75ca0e1d72b561f7b0c256ac93c1fa66da977f043b510be4e2899c73c55b5da19c51f0c1825f625e6d  st-c63a87cd936c1eeef14c4c21572e5b782d3df4bc.tar.gz
 d0b4d0b2724ed1ba898703f957fc95e1f345c8bd880fa4bf991df49a4a670f7f817fd21efc9c5717c57e4d1f0a58c67673ec17c4daf365a017b4b1a025a0fa7f  0001-Port-to-wayland-using-wld.patch
+f1ba3ebdfca1cb9d32ab3d7a516296ae214c1fda6f03b8ae036914f9917f7ef0a43a970659bc3d1bd82c51f027ec7bdd66877eb816f5fcc8ee0570e2f318bff3  0002-Only-send-SIGHUP-on-close-when-using-PTY.patch
+6a050dab39eaf1a62146da0cb58d063a6b1908586893e90b4f76493757176f83d2d0da9e10132c664a65fe1e4993b9dc700c20b1fdd91868c15762863ce11ebe  0003-Add-support-for-plumbing-via-right-click.patch
+f862b55393cc540a12bdacdec017e3b36f6e89eba1e2f2eb0ba2f25a576a6366e31fde5cab51c5633118d5e529286a4ed3b4d3b1a9ea56dfa6ad3490f413d35a  0004-Start-dmenu-on-bottom-for-ISO-14755-input.patch
+eded8fef405ebf71e0801709992ac25ea4990e86b34852c1399c8f20948297a58783052e2da3d9a041d495d156d0ed535cd4b37d3659da20f4a82cf1305cd160  config.h
 "
