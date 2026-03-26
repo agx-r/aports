@@ -12,8 +12,13 @@ jobs:
         include:
           - arch: x86_64
             platform: linux/amd64
+            repo: main
+          - arch: x86_64
+            platform: linux/amd64
+            repo: personal-agx
           - arch: riscv64
             platform: linux/riscv64
+            repo: main
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -37,19 +42,20 @@ jobs:
         run: |
           mkdir -p output_packages
           chmod 777 output_packages
-          PKGS=$(ls ${{ github.workspace }}/main/)
+          PKGS=$(ls ${{ github.workspace }}/${{ matrix.repo }}/)
           docker run --rm \
             -v ${{ github.workspace }}:/work \
             -v ${{ github.workspace }}/gh-pages:/gh-pages \
             -w /work \
             --platform ${{ matrix.platform }} \
             -e PKGS="$PKGS" \
+            -e REPO="${{ matrix.repo }}" \
             alpine:latest sh /work/.github/scripts/build-inner.sh
 
       - name: upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: packages-${{ matrix.arch }}
+          name: packages-${{ matrix.arch }}-${{ matrix.repo }}
           path: output_packages/
           if-no-files-found: ignore
 

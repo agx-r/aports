@@ -1,0 +1,40 @@
+# Contributor: Sören Tempel <soeren+alpine@soeren-tempel.net>
+# Maintainer: agx <agxr@tuta.io>
+pkgname=st-wld
+_commit=c63a87cd936c1eeef14c4c21572e5b782d3df4bc
+pkgver=0.7_git20161214
+pkgrel=1
+pkgdesc="st terminal ported to Wayland using wld"
+url="https://github.com/michaelforney/st"
+arch="all"
+license="MIT"
+depends="ncurses-terminfo-base font-liberation"
+makedepends="fontconfig-dev freetype-dev wayland-dev wayland-protocols libxkbcommon-dev wld-dev pixman-dev"
+subpackages="$pkgname-doc $pkgname-dbg"
+source="st-$_commit.tar.gz::https://github.com/michaelforney/st/archive/$_commit.tar.gz
+        0001-Port-to-wayland-using-wld.patch"
+
+provides="st-virtual"
+provider_priority=100
+builddir="$srcdir/st-$_commit"
+
+prepare() {
+    default_prepare
+    local proto_xml="/usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml"
+    sed -i "s|^XDG_SHELL_PROTO =.*|XDG_SHELL_PROTO = $proto_xml|" config.mk
+    sed -i 's/xdg-shell-unstable-v5/xdg-shell/g' Makefile
+    sed -i '/tic/d' Makefile
+}
+
+build() {
+	make
+}
+
+package() {
+	make DESTDIR="$pkgdir" PREFIX=/usr install
+}
+
+sha512sums="
+2f744b642a1eadc31d07f70a1c9f5d21aea6de2df6713d75ca0e1d72b561f7b0c256ac93c1fa66da977f043b510be4e2899c73c55b5da19c51f0c1825f625e6d  st-c63a87cd936c1eeef14c4c21572e5b782d3df4bc.tar.gz
+d0b4d0b2724ed1ba898703f957fc95e1f345c8bd880fa4bf991df49a4a670f7f817fd21efc9c5717c57e4d1f0a58c67673ec17c4daf365a017b4b1a025a0fa7f  0001-Port-to-wayland-using-wld.patch
+"

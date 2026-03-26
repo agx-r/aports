@@ -17,7 +17,7 @@ echo "PACKAGER_PRIVKEY=/home/builder/.abuild/$PRIVKEY_NAME" > /home/builder/.abu
 
 ARCH=$(apk --print-arch)
 LOCAL_REPODIR="/home/builder/packages"
-mkdir -p "$LOCAL_REPODIR/main/$ARCH"
+mkdir -p "$LOCAL_REPODIR/$REPO/$ARCH"
 
 chown -R builder:builder /home/builder
 chown -R builder:builder /work
@@ -28,7 +28,7 @@ apk update
 
 
 for pkgname_dir in $PKGS; do
-  pkg_dir="/work/main/$pkgname_dir"
+  pkg_dir="/work/$REPO/$pkgname_dir"
   [ -f "$pkg_dir/APKBUILD" ] || continue
 
   pkgname=$(. "$pkg_dir/APKBUILD" 2>/dev/null; echo "$pkgname")
