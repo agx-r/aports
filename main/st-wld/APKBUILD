@@ -2,7 +2,7 @@
 # Maintainer: agx <agxr@tuta.io>
 pkgname=st
 pkgver=0.7
-pkgrel=0
+pkgrel=1
 pkgdesc="Suckless terminal emulator ported to Wayland using wld"
 url="https://st.suckless.org"
 arch="all"
