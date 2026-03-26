@@ -9,6 +9,10 @@ PUBKEY=$(ls /work/keys/*.pub | head -n 1)
 PUBKEY_NAME=$(basename "$PUBKEY")
 PRIVKEY_NAME="${PUBKEY_NAME%.pub}"
 
+cp "$PUBKEY" /etc/apk/keys/$PUBKEY_NAME
+echo "https://agx-r.github.io/aports/main" >> /etc/apk/repositories
+apk update
+
 cat /work/.privkey > /home/builder/.abuild/$PRIVKEY_NAME
 cp "$PUBKEY" /home/builder/.abuild/$PUBKEY_NAME
 cp "$PUBKEY" /etc/apk/keys/$PUBKEY_NAME
