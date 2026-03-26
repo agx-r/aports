@@ -1,7 +1,7 @@
 # Maintainer: agx <agxr@tuta.io>
 pkgname=wld
 pkgver=0.0.1
-pkgrel=0
+pkgrel=1
 pkgdesc="A drawing library that targets Wayland"
 url="https://github.com/michaelforney/wld"
 arch="all"
@@ -28,7 +28,9 @@ EOF
 }
 
 build() {
-	make PREFIX=/usr
+	make PREFIX=/usr \
+		CFLAGS="$CFLAGS" \
+		LDFLAGS="$LDFLAGS"
 }
 
 package() {
