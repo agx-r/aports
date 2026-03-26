@@ -1,0 +1,40 @@
+# Maintainer: agx <agxr@tuta.io>
+pkgname=wld
+pkgver=0.0.1
+pkgrel=0
+pkgdesc="A drawing library that targets Wayland"
+url="https://github.com/michaelforney/wld"
+arch="all"
+license="MIT"
+depends=""
+makedepends="wayland-dev wayland-protocols libxkbcommon-dev
+						 pixman-dev libdrm-dev mesa-dev fontconfig-dev freetype-dev"
+subpackages="$pkgname-dev"
+source="$pkgname-$pkgver.tar.gz::https://github.com/michaelforney/wld/archive/master.tar.gz"
+
+builddir="$srcdir/$pkgname-master"
+
+prepare() {
+	default_prepare
+	cat > config.mk <<EOF
+ENABLE_SHARED = 1
+ENABLE_STATIC = 1
+ENABLE_WAYLAND = 1
+ENABLE_DRM = 1
+ENABLE_PIXMAN = 1
+WAYLAND_INTERFACES = shm drm
+DRM_DRIVERS =
+EOF
+}
+
+build() {
+	make PREFIX=/usr
+}
+
+package() {
+	make install \
+		DESTDIR="$pkgdir" \
+		PREFIX=/usr \
+		LIBDIR=/usr/lib \
+		INCLUDEDIR=/usr/include
+}
