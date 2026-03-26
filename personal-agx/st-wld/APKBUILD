@@ -3,7 +3,7 @@
 pkgname=st-wld
 _commit=c63a87cd936c1eeef14c4c21572e5b782d3df4bc
 pkgver=0.7_git20161214
-pkgrel=4
+pkgrel=5
 pkgdesc="st terminal ported to Wayland using wld"
 url="https://github.com/michaelforney/st"
 arch="all"
@@ -23,11 +23,12 @@ provider_priority=100
 builddir="$srcdir/st-$_commit"
 
 prepare() {
-    default_prepare
-    local proto_xml="/usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml"
-    sed -i "s|^XDG_SHELL_PROTO =.*|XDG_SHELL_PROTO = $proto_xml|" config.mk
-    sed -i 's/xdg-shell-unstable-v5/xdg-shell/g' Makefile
-    sed -i '/tic/d' Makefile
+  default_prepare
+	cp "$srcdir"/config.h "$builddir"/config.h
+  local proto_xml="/usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml"
+  sed -i "s|^XDG_SHELL_PROTO =.*|XDG_SHELL_PROTO = $proto_xml|" config.mk
+  sed -i 's/xdg-shell-unstable-v5/xdg-shell/g' Makefile
+  sed -i '/tic/d' Makefile
 }
 
 build() {
