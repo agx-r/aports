@@ -1,3 +1,4 @@
+#!/bin/sh
 set -e
 
 apk add alpine-sdk sudo
@@ -12,19 +13,18 @@ PRIVKEY_NAME="${PUBKEY_NAME%.pub}"
 cp "$PUBKEY" /etc/apk/keys/$PUBKEY_NAME
 cat /work/.privkey > /home/builder/.abuild/$PRIVKEY_NAME
 cp "$PUBKEY" /home/builder/.abuild/$PUBKEY_NAME
-
 echo "PACKAGER_PRIVKEY=/home/builder/.abuild/$PRIVKEY_NAME" > /home/builder/.abuild/abuild.conf
-chown -R builder:builder /home/builder/.abuild
-chown -R builder:builder /work
 
 ARCH=$(apk --print-arch)
-LOCAL_REPODIR="/home/builder/packages/main"
-mkdir -p "$LOCAL_REPODIR/$ARCH"
+LOCAL_REPODIR="/home/builder/packages"
+mkdir -p "$LOCAL_REPODIR/main/$ARCH"
 
-echo "$LOCAL_REPODIR" >> /etc/apk/repositories
+chown -R builder:builder /home/builder
+chown -R builder:builder /work
+
+echo "$LOCAL_REPODIR/main" >> /etc/apk/repositories
 echo "https://agx-r.github.io/aports/main" >> /etc/apk/repositories
 apk update
-
 
 
 for pkgname_dir in $PKGS; do
@@ -47,10 +47,9 @@ for pkgname_dir in $PKGS; do
   su builder -c "cd $pkg_dir && abuild -r -c" || exit 1
 
   echo "--- Updating local index for $ARCH..."
-  cd "$LOCAL_REPODIR/$ARCH"
+  cd "$LOCAL_REPODIR/main/$ARCH"
   
   su builder -c "apk index -o APKINDEX.tar.gz *.apk"
-  
   su builder -c "abuild-sign -k /home/builder/.abuild/$PRIVKEY_NAME APKINDEX.tar.gz"
   
   apk update
