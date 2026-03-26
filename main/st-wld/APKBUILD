@@ -31,7 +31,7 @@ build() {
 }
 
 package() {
-	make install PREFIX=/usr
+	make DESTDIR="$pkgdir" PREFIX=/usr install
 }
 
 sha512sums="
