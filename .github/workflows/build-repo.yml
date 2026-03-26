@@ -37,12 +37,13 @@ jobs:
         run: |
           mkdir -p output_packages
           chmod 777 output_packages
-
+          PKGS=$(ls ${{ github.workspace }}/main/)
           docker run --rm \
             -v ${{ github.workspace }}:/work \
             -v ${{ github.workspace }}/gh-pages:/gh-pages \
             -w /work \
             --platform ${{ matrix.platform }} \
+            -e PKGS="$PKGS" \
             alpine:latest sh /work/.github/scripts/build-inner.sh
 
       - name: upload artifacts
