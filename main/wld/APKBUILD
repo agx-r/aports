@@ -38,3 +38,6 @@ package() {
 		LIBDIR=/usr/lib \
 		INCLUDEDIR=/usr/include
 }
+sha512sums="
+f0782b28cc3af61f32ee8b999afa40f600847eead35bcb6416a1c19be66f1f976ee502a56ba7a57738c4913be8326bee05d9dbd85ff036964ab1509d64c23f61  wld-0.0.1.tar.gz
+"
