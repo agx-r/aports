@@ -47,7 +47,7 @@ for pkgname_dir in $PKGS; do
   su builder -c "cd $pkg_dir && abuild -r -c" || exit 1
 
   echo "--- Updating local index for $ARCH..."
-  cd "$LOCAL_REPODIR/main/$ARCH"
+  cd "$LOCAL_REPODIR/$REPO/$ARCH"
   
   su builder -c "apk index -o APKINDEX.tar.gz *.apk"
   su builder -c "abuild-sign -k /home/builder/.abuild/$PRIVKEY_NAME APKINDEX.tar.gz"
