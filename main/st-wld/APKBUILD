@@ -20,9 +20,9 @@ builddir="$srcdir/st-$_commit"
 
 prepare() {
     default_prepare
-    local proto_xml="/usr/share/wayland-protocols/unstable/xdg-shell/xdg-shell-unstable-v5.xml"
+    local proto_xml="/usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml"
     sed -i "s|^XDG_SHELL_PROTO =.*|XDG_SHELL_PROTO = $proto_xml|" config.mk
-    sed -i 's/xdg-shell-unstable-v5-client-protocol.h/xdg-shell-client-protocol.h/g' Makefile
+    sed -i 's/xdg-shell-unstable-v5/xdg-shell/g' Makefile
     sed -i '/tic/d' Makefile
 }
 
