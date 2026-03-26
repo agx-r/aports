@@ -16,6 +16,7 @@ source="st-$_commit.tar.gz::https://github.com/michaelforney/st/archive/$_commit
 
 provides="st-virtual"
 provider_priority=100
+builddir="$srcdir/st-$_commit"
 
 prepare() {
 	default_prepare
