@@ -1,0 +1,75 @@
+# Contributor: Zhurman <svyat0063@gmail.com>
+# Maintainer:
+pkgname=simulide
+pkgver=1.1.0
+_realver=1.1.0-SR2
+pkgrel=2
+pkgdesc="Simple real time electronic circuit simulator."
+url="https://simulide.com"
+
+arch="x86_64"
+license="AGPL-3.0-only"
+
+subpackages="$pkgname-examples:_examples $pkgname-data:_data:noarch"
+depends="qt5-qtbase qt5-qtbase-x11 qt5-qtmultimedia qt5-qtserialport qt5-qtsvg $pkgname-data"
+makedepends="qt5-qtbase-dev qt5-qttools-dev qt5-qtmultimedia-dev qt5-qtserialport-dev qt5-qtsvg-dev"
+options="!check"
+_commit="28965e3bd6dd118598db1f5639ce1cf2e3c56e36"
+source="
+	$pkgname-$pkgver.zip::https://github.com/Arcachofo/SimuliDE-1/archive/${_commit}.zip
+	$pkgname.desktop::https://aur.archlinux.org/cgit/aur.git/plain/${pkgname}.desktop?h=${pkgname}
+"
+
+builddir="${srcdir}/SimuliDE-1-${_commit}"
+
+
+build() {
+	cd "${builddir}/build_XX"
+	qmake
+	make
+}
+
+package() {
+	install -D -m644 "${srcdir}/simulide.desktop" "${pkgdir}/usr/share/applications/${pkgname}.desktop"
+
+	cd "${builddir}/build_XX/executables/SimulIDE_${_realver}"
+
+	# binary
+	mkdir -p "${pkgdir}/usr/bin"
+	cp simulide "${pkgdir}/usr/bin/"
+
+	# icon
+	mkdir -p "${pkgdir}/usr/share/icons/hicolor/256x256"
+	cp ${builddir}/resources/icons/simulide.png "${pkgdir}/usr/share/icons/hicolor/256x256/simulide.png"
+}
+
+
+_examples() {
+	pkgdesc="SimulIDE example files."
+	depends=""
+	options="!strip"
+
+	# examples
+	cd "${builddir}/build_XX/executables/SimulIDE_${_realver}"
+
+	mkdir -p "${subpkgdir}/usr/share/simulide"
+	cp -r ./examples "${subpkgdir}/usr/share/simulide"
+}
+
+_data() {
+	pkgdesc="SimulIDE data files."
+	depends=""
+	options="!strip"
+
+	# data
+	cd "${builddir}/build_XX/executables/SimulIDE_${_realver}"
+
+	mkdir -p "${subpkgdir}/usr/share/simulide"
+	cp -r ./data "${subpkgdir}/usr/share/simulide"
+}
+
+
+sha512sums="
+963bff6e85675531b80db5180add8808f4b4581dc8763a1136e3a7c22f9ddcbb15ccdea08b31d637dcf372951a9652606bc880ae8f31aed0dbf778925c481b52  simulide-1.1.0.zip
+e14309a0b1f2f7e2d2f3e07ceb3e0906517122b9946bdb215f5a105d188e19fa1485c991bdd564d368fe33c05ba8c2e30187b9ac12620a1b34cc0686f16fd71a  simulide.desktop
+"
