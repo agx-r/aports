@@ -1,0 +1,60 @@
+From 29620ee18a8ac08582fa979a9e65f6d1145644f0 Mon Sep 17 00:00:00 2001
+From: agx <agx@agxr@tuta.io>
+Date: Fri, 27 Mar 2026 23:07:49 +0000
+Subject: [PATCH] security: implement Landlock fail-closed sandbox
+
+---
+ main/main.go | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+diff --git a/main/main.go b/main/main.go
+index e8824e6f..3fdb8d48 100644
+--- a/main/main.go
++++ b/main/main.go
+@@ -2,15 +2,43 @@ package main
+ 
+ import (
+ 	"flag"
++	"log"
+ 	"os"
++	"path/filepath"
+ 
+ 	"github.com/xtls/xray-core/main/commands/base"
+ 	_ "github.com/xtls/xray-core/main/distro/all"
++
++	"github.com/landlock-lsm/go-landlock/landlock"
+ )
+ 
+ func main() {
+ 	os.Args = getArgsV4Compatible()
+ 
++	var configPath string
++	for i, arg := range os.Args {
++		if (arg == "-c" || arg == "-config" || arg == "--config") && i+1 < len(os.Args) {
++			configPath = os.Args[i+1]
++			break
++		}
++	}
++
++	allowedPaths := []landlock.Rule{
++		landlock.RODirs("/etc/ssl"),
++	}
++
++	if configPath != "" {
++		absPath, err := filepath.Abs(configPath)
++		if err == nil {
++			allowedPaths = append(allowedPaths, landlock.RODirs(filepath.Dir(absPath)))
++		}
++	}
++
++	err := landlock.V4.RestrictPaths(allowedPaths...)
++	if err != nil {
++		log.Fatalf("FATAL: Security violation - Landlock failed: %v", err)
++	}
++
+ 	base.RootCommand.Long = "Xray is a platform for building proxies."
+ 	base.RootCommand.Commands = append(
+ 		[]*base.Command{
+-- 
+2.53.0
+

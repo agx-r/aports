@@ -16,6 +16,9 @@ jobs:
           - arch: x86_64
             platform: linux/amd64
             repo: personal-agx
+          - arch: x86_64
+            platform: linux/amd64
+            repo: hardened
           - arch: riscv64
             platform: linux/riscv64
             repo: main
