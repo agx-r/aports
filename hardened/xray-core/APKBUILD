@@ -1,7 +1,7 @@
 # Maintainer: agx <agxr@tuta.io>
 pkgname="xray-core"
 pkgver="26.2.6"
-pkgrel=0
+pkgrel=1
 pkgdesc="Xray-core"
 url="https://github.com/xtls/xray-core"
 arch="all"
